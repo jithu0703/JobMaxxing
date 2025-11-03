@@ -4,104 +4,58 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
-# ====================================================
-# USERS
-# ====================================================
 class User(db.Model):
-    __tablename__ = 'users'
-
+    __tablename__ = "users"
     user_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(120), nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=False)
-    role = db.Column(db.String(50), default="user")  # e.g. "user" or "admin"
-    resume_link = db.Column(db.String(255), nullable=True)
-
-    # Relationship to admin (optional)
-    admin = db.relationship('Admin', backref='user', uselist=False)
+    password_hash = db.Column(db.String(128), nullable=False)
+    role = db.Column(db.String(20), default="student")
+    resume_link = db.Column(db.String(256))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
-    
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def __repr__(self):
-        return f"<User {self.username} ({self.email})>"
 
-
-# ====================================================
-# ADMINS
-# ====================================================
-class Admin(db.Model):
-    __tablename__ = 'admin'
-
-    admin_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), unique=True, nullable=False)
-
-    def __repr__(self):
-        return f"<Admin user_id={self.user_id}>"
-
-
-# ====================================================
-# COMPANY
-# ====================================================
 class Company(db.Model):
-    __tablename__ = 'company'
-
+    __tablename__ = "companies"
     company_id = db.Column(db.Integer, primary_key=True)
-    company_name = db.Column(db.String(150), nullable=False)
-    website = db.Column(db.String(255), nullable=True)
-    location = db.Column(db.String(150), nullable=True)
-    industry = db.Column(db.String(100), nullable=True)
-    source_type = db.Column(db.String(50), nullable=True)  # internal or external source
+    company_name = db.Column(db.String(120), unique=True, nullable=False)
 
-    # Relationships
-    job_sources = db.relationship('JobSource', backref='company', lazy=True)
-    jobs = db.relationship('Job', backref='company', lazy=True)
-
-    def __repr__(self):
-        return f"<Company {self.company_name}>"
+    # One company has multiple jobs
+    jobs = db.relationship("Job", back_populates="company", cascade="all, delete-orphan")
 
 
-# ====================================================
-# JOB SOURCE
-# ====================================================
 class JobSource(db.Model):
-    __tablename__ = 'job_source'
-
+    __tablename__ = "job_sources"
     source_id = db.Column(db.Integer, primary_key=True)
-    company_id = db.Column(db.Integer, db.ForeignKey('company.company_id'), nullable=False)
-    source_type = db.Column(db.String(50), nullable=False)
-    source_url = db.Column(db.String(255), nullable=False)
-    api_key = db.Column(db.String(255), nullable=True)
-    last_fetched = db.Column(db.DateTime, default=datetime.utcnow)
+    company_id = db.Column(db.Integer, db.ForeignKey("companies.company_id"), nullable=False)
+    source_type = db.Column(db.String(50))
+    source_url = db.Column(db.String(256))
 
-    # Relationship
-    jobs = db.relationship('Job', backref='source', lazy=True)
-
-    def __repr__(self):
-        return f"<JobSource {self.source_type} ({self.source_url})>"
+    company = db.relationship("Company", backref="sources")
 
 
-# ====================================================
-# JOBS
-# ====================================================
 class Job(db.Model):
-    __tablename__ = 'jobs'
-
+    __tablename__ = "jobs"
     job_id = db.Column(db.Integer, primary_key=True)
-    company_id = db.Column(db.Integer, db.ForeignKey('company.company_id'), nullable=False)
-    source_id = db.Column(db.Integer, db.ForeignKey('job_source.source_id'), nullable=True)
-    
-    title = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text, nullable=False)
-    salary = db.Column(db.String(50), nullable=True)
-    location = db.Column(db.String(150), nullable=True)
-    type = db.Column(db.String(50), nullable=True)  # e.g. Full-time, Part-time
-    posted_date = db.Column(db.DateTime, default=datetime.utcnow)
-    deadline = db.Column(db.DateTime, nullable=True)
+    title = db.Column(db.String(255), nullable=False)
+    company_id = db.Column(db.Integer, db.ForeignKey("companies.company_id"), nullable=False)
+    source_id = db.Column(db.Integer, db.ForeignKey("job_sources.source_id"))
+    location = db.Column(db.String(255))
+    salary = db.Column(db.String(255))
+    type = db.Column(db.String(50))  # Full-time, Part-time, Internship, etc.
+    posted_date = db.Column(db.Date)
+    deadline = db.Column(db.Date)
+    description = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __repr__(self):
-        return f"<Job {self.title} @ {self.company_id}>"
+    company = db.relationship("Company", back_populates="jobs")
+    source = db.relationship("JobSource")

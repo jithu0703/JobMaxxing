@@ -1,46 +1,61 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AdminRoute from "../components/AdminRoute";
+import { useState } from "react";
+import axios from "axios";
+import "../styles/ScrapePage.css";
 
-const ScrapePage = () => {
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("Starting scraping...");
-  const navigate = useNavigate();
+function ScrapeOptionsPage() {
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const scrapeData = async () => {
-      try {
-        const response = await fetch("http://127.0.0.1:5000/scrape/internshala"); // your Flask endpoint
-        if (!response.ok) {
-          throw new Error("Failed to scrape");
-        }
-        const data = await response.json();
-        console.log("Scraping result:", data);
-        setMessage(`Scraping completed! Fetched ${data.count} items.`);
-        
-        // Wait 1 second and redirect to home
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
-      } catch (error) {
-        console.error(error);
-        setMessage("Error during scraping");
-        setTimeout(() => {
-          navigate("/");
-        }, 2000);
-      } finally {
-        setLoading(false);
-      }
-    };
+  async function handleScrapeInternshala() {
+    setLoading(true);
+    setResult(null);
+    setError(null);
 
-    scrapeData();
-  }, [navigate]);
+    try {
+      const token = localStorage.getItem("authToken");
+      const res = await axios.post("http://localhost:5000/scrape/internshala", null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setResult(res.data);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to scrape data.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      {loading && <h2>{message}</h2>}
-      {!loading && <h3>{message}</h3>}
-    </div>
-  );
-};
+    <AdminRoute>
+      <div className="scrape-options-container container">
+        <h1 className="page-title">Scraping Options (Admin Only)</h1>
+        <p>Select a source below to start scraping jobs:</p>
 
-export default ScrapePage;
+        <button
+          className="btn btn-primary btn-lg"
+          onClick={handleScrapeInternshala}
+          disabled={loading}
+        >
+          {loading ? "Scraping Internshala..." : "Scrape Internshala"}
+        </button>
+
+        {result && (
+          <div style={{ marginTop: 20, color: "green" }}>
+            Scraped {result.scraped_count} jobs successfully.
+          </div>
+        )}
+
+        {error && (
+          <div style={{ marginTop: 20, color: "red" }}>
+            Error: {error}
+          </div>
+        )}
+      </div>
+    </AdminRoute>
+  );
+}
+
+export default ScrapeOptionsPage;

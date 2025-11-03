@@ -54,3 +54,30 @@ def login():
             'token': token
         })
     return jsonify({'message': 'Invalid email or password'}), 401
+
+
+@auth_bp.route("/user/role", methods=["GET"])
+def get_user_role():
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"role": None}), 401
+
+    # Extract token from "Bearer <token>" format or token only
+    parts = auth_header.split()
+    token = None
+    if len(parts) == 2 and parts[0].lower() == "bearer":
+        token = parts[1]
+    else:
+        token = parts[0]
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        user = User.query.filter_by(user_id=payload['user_id']).first()
+        if not user:
+            return jsonify({"role": None}), 401
+        
+        return jsonify({"role": user.role})
+    except jwt.ExpiredSignatureError:
+        return jsonify({"message": "Token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"message": "Invalid token"}), 401

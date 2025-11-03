@@ -4,9 +4,8 @@ const API = axios.create({
   baseURL: "http://localhost:5000", // Flask backend URL
 });
 
-
 export const signupUser = async (data) => {
-  return await axios.post("http://localhost:5000/users", data, {
+  return await API.post("/users", data, {
     headers: { "Content-Type": "application/json" },
   });
 };

@@ -1,37 +1,24 @@
-import { useEffect, useState } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import JobCard from "./JobCard";
 
-function JobList() {
-  const [jobs, setJobs] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:5000/jobs")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => setJobs(data))
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        setError(err.message);
-      });
-  }, []);
-
-  if (error) return <p className="text-red-500">Error: {error}</p>;
+function JobList({ jobs, onJobClick }) {
+  if (!jobs || jobs.length === 0) {
+    return <p>No jobs available.</p>;
+  }
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Available Jobs / Internships</h2>
-      {jobs.length === 0 ? (
-        <p>No jobs available at the moment.</p>
-      ) : (
-        jobs.map((job, idx) => <JobCard key={idx} job={job} />)
-      )}
+    <div className="job-list">
+      {jobs.map((job) => (
+        <JobCard key={job.job_id} job={job} onClick={onJobClick} />
+      ))}
     </div>
   );
 }
+
+JobList.propTypes = {
+  jobs: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onJobClick: PropTypes.func.isRequired,
+};
 
 export default JobList;
