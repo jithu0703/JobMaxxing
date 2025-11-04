@@ -49,10 +49,11 @@ class Job(db.Model):
     source_id = db.Column(db.Integer, db.ForeignKey("job_sources.source_id"))
     location = db.Column(db.String(255))
     salary = db.Column(db.String(255))
-    type = db.Column(db.String(50))  # Full-time, Part-time, Internship, etc.
+    type = db.Column(db.String(50))  # Full-time, Internship, etc.
     posted_date = db.Column(db.Date)
     deadline = db.Column(db.Date)
     description = db.Column(db.Text)
+    apply_url = db.Column(db.String(512))  # URL for applying to the job
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

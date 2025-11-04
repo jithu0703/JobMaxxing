@@ -11,6 +11,7 @@ import ScrapePage from "./pages/ScrapePage";
 import Header from "./components/Header";
 import JobsPage from "./pages/Jobs";
 import JobPage from "./pages/JobPage";
+import CompaniesPage from "./pages/CompaniesPage";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -23,6 +24,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/jobs" element={<JobsPage />} />
         <Route path="/job/:jobId" element={<JobPage />} />
+        <Route path="/companies" element={<CompaniesPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/dashboard" element={<Dashboard />} />

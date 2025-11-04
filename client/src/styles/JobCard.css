@@ -1,10 +1,10 @@
 .job-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
   gap: var(--space-6);
   padding: var(--space-5);
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: 1200px;    /* Maximum width container */
+  margin: 0 auto;       /* Center horizontally */
 }
 
 .job-card {
@@ -15,8 +15,12 @@
   box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition: box-shadow 0.3s ease, transform 0.2s ease;
-}
 
+  height: auto; /* Allow height to adjust based on content */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 .job-card:hover {
   box-shadow: var(--shadow-lg);
   transform: translateY(-4px);

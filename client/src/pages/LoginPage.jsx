@@ -16,7 +16,7 @@ const Login = () => {
     setMessage(res.data.message);
     setMsgType("success");
     if (res.data.message.toLowerCase().includes("successful")) {
-      setTimeout(() => navigate("/dashboard"), 1500);
+      setTimeout(() => navigate("/"), 1500);
     }
   } catch (error) {
     setMessage("Invalid email or password.");

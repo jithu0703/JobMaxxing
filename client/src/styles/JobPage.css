@@ -1,34 +1,117 @@
-.job-details {
-  background-color: var(--color-surface);
-  max-width: 800px;
-  margin: var(--space-8) auto;
-  padding: var(--space-6);
+.job-page-container {
+  max-width: 900px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: var(--color-surface);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   color: var(--color-text-primary);
 }
 
-.job-details h1 {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
-  margin-bottom: var(--space-4);
+.job-title {
+  font-size: 2.5rem;
+  color: var(--color-primary-700);
+  margin-bottom: 0.3em;
+}
+
+.company-name {
+  font-size: 1.5rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5em;
+}
+
+.job-meta, .job-dates {
+  display: flex;
+  gap: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--color-primary-600);
+}
+
+.job-description {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  white-space: pre-line;
+}
+
+.apply-button {
+  background-color: var(--color-primary-700);
+  color: white;
+  padding: 0.8em 2em;
+  font-size: 1.2rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.apply-button:hover {
+  background-color: var(--color-primary-900);
+}
+
+.job-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 600px;
+  margin: 2rem auto;
+  background: var(--color-surface);
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.job-edit-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
   color: var(--color-primary-700);
 }
 
-.job-details h3 {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-medium);
-  margin-bottom: var(--space-3);
-  color: var(--color-text-secondary);
+.input-field,
+.textarea-field {
+  margin-top: var(--space-1);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  resize: vertical;
 }
 
-.job-details p {
-  font-size: var(--font-size-base);
-  line-height: 1.6;
-  margin-bottom: var(--space-3);
+.edit-form-buttons {
+  margin-top: var(--space-4);
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
 }
 
-.job-details strong {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-primary-600);
+.btn {
+  cursor: pointer;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
 }
+
+.btn-primary {
+  background-color: var(--color-primary-700);
+  color: var(--color-on-primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-900);
+}
+
+.btn-secondary {
+  background-color: var(--color-surface);
+  color: var(--color-primary-700);
+  border: 2px solid var(--color-primary-700);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-primary-100);
+}
+

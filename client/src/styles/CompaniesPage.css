@@ -1,0 +1,58 @@
+.companies-page {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: var(--space-5);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+}
+
+.company-form {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.company-form input {
+  flex-grow: 1;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.company-form button {
+  background-color: var(--color-primary-700);
+  color: var(--color-on-primary);
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.company-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.company-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.company-item button {
+  margin-left: var(--space-2);
+  background: transparent;
+  color: var(--color-primary-700);
+  border: 1px solid var(--color-primary-700);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  cursor: pointer;
+}
+
+.company-item button:hover {
+  background-color: var(--color-primary-100);
+}
