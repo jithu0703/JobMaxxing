@@ -1,37 +1,82 @@
 .companies-page {
-  max-width: 720px;
+  max-width: 700px;
   margin: 2rem auto;
   padding: var(--space-5);
   background: var(--color-surface);
-  box-shadow: var(--shadow-md);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
   color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+.error-message {
+  background-color: var(--color-error-dark);
+  color: var(--color-error-main);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+}
+
+.success-message {
+  background-color: var(--color-success-light);
+  color: var(--color-success-main);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
 }
 
 .company-form {
   display: flex;
   gap: var(--space-3);
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-6);
 }
 
-.company-form input {
+.input-field {
   flex-grow: 1;
-  padding: var(--space-2);
+  padding: var(--space-3);
+  font-size: 1rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
 }
 
-.company-form button {
-  background-color: var(--color-primary-700);
-  color: var(--color-on-primary);
+.input-field:disabled {
+  cursor: not-allowed;
+  background: var(--color-disabled-bg);
+}
+
+.btn {
   padding: var(--space-2) var(--space-4);
-  border: none;
   border-radius: var(--radius-sm);
+  border: none;
+  font-weight: 700;
   cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-primary-600);
+  color: var(--color-on-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-800);
+}
+
+.btn-secondary {
+  background-color: var(--color-fill);
+  color: var(--color-primary-600);
+  border: 2px solid var(--color-primary-600);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-primary-100);
 }
 
 .company-list {
-  list-style: none;
+  list-style-type: none;
   padding-left: 0;
 }
 
@@ -43,16 +88,31 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.company-item button {
-  margin-left: var(--space-2);
-  background: transparent;
-  color: var(--color-primary-700);
-  border: 1px solid var(--color-primary-700);
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-2);
-  cursor: pointer;
+.action-buttons {
+  display: flex;
+  gap: var(--space-2);
 }
 
-.company-item button:hover {
-  background-color: var(--color-primary-100);
+.btn-edit {
+  background-color: var(--color-primary-700);
+  color: var(--color-on-primary);
+}
+
+.btn-edit:hover:not(:disabled) {
+  background-color: var(--color-primary-900);
+}
+
+.btn-delete {
+  background-color: var(--color-error-main);
+  color: var(--color-on-error);
+}
+
+.btn-delete:hover:not(:disabled) {
+  background-color: var(--color-error-dark);
+}
+
+.loading {
+  font-style: italic;
+  color: var(--color-disabled);
+  margin-bottom: var(--space-4);
 }

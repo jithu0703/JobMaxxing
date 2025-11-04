@@ -54,9 +54,6 @@ function Home() {
           <div className="secondary-actions">
             {isLoggedIn ? (
               <>
-                <Link to="/dashboard" className="btn btn-secondary">
-                  Dashboard
-                </Link>
                 <button className="btn btn-outline" onClick={handleLogout}>
                   Logout
                 </button>

@@ -1,19 +1,41 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import axios from "axios";
 import "../styles/Header.css";
 
 function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     setIsLoggedIn(!!token);
+
+    // Fetch user info to check if admin
+    if (token) {
+      fetchUserInfo(token);
+    }
   }, []);
+
+  async function fetchUserInfo(token) {
+    try {
+      const res = await axios.get("http://localhost:5000/user/role", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // Assuming your dashboard returns user info with role
+      if (res.data && res.data.role === "admin") {
+        setIsAdmin(true);
+      }
+    } catch (err) {
+      console.error("Failed to fetch user info:", err);
+    }
+  }
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     setIsLoggedIn(false);
+    setIsAdmin(false);
     navigate("/login");
   };
 
@@ -31,12 +53,18 @@ function Header() {
         </Link>
         {isLoggedIn ? (
           <>
-            <Link to="/dashboard" className="nav-link">
-              Dashboard
-            </Link>
+            {isAdmin && (
+              <Link to="/companies" className="nav-link">
+                Companies
+              </Link>
+            )}
             <button className="nav-link logout-btn" onClick={handleLogout}>
               Logout
             </button>
+            <button className="nav-link logout-btn" onClick={() => navigate("/profile")}>
+            👤
+            </button>
+
           </>
         ) : (
           <>

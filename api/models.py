@@ -30,23 +30,37 @@ class Company(db.Model):
     # One company has multiple jobs
     jobs = db.relationship("Job", back_populates="company", cascade="all, delete-orphan")
 
+    # Correct back_populates to match in JobSource
+    job_sources = db.relationship(
+        'JobSource',
+        cascade="all, delete-orphan",
+        back_populates='company'
+    )
+
 
 class JobSource(db.Model):
     __tablename__ = "job_sources"
     source_id = db.Column(db.Integer, primary_key=True)
-    company_id = db.Column(db.Integer, db.ForeignKey("companies.company_id"), nullable=False)
+    company_id = db.Column(db.Integer, db.ForeignKey("companies.company_id", ondelete="CASCADE"), nullable=False)
     source_type = db.Column(db.String(50))
     source_url = db.Column(db.String(256))
 
-    company = db.relationship("Company", backref="sources")
+    company = db.relationship("Company", back_populates="job_sources")
+
+    # Add relationship to jobs with cascade delete
+    jobs = db.relationship(
+        "Job",
+        back_populates="source",
+        cascade="all, delete-orphan"
+    )
 
 
 class Job(db.Model):
     __tablename__ = "jobs"
     job_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
-    company_id = db.Column(db.Integer, db.ForeignKey("companies.company_id"), nullable=False)
-    source_id = db.Column(db.Integer, db.ForeignKey("job_sources.source_id"))
+    company_id = db.Column(db.Integer, db.ForeignKey("companies.company_id", ondelete="CASCADE"), nullable=False)
+    source_id = db.Column(db.Integer, db.ForeignKey("job_sources.source_id", ondelete="CASCADE"))
     location = db.Column(db.String(255))
     salary = db.Column(db.String(255))
     type = db.Column(db.String(50))  # Full-time, Internship, etc.
@@ -59,4 +73,4 @@ class Job(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     company = db.relationship("Company", back_populates="jobs")
-    source = db.relationship("JobSource")
+    source = db.relationship("JobSource", back_populates="jobs")
