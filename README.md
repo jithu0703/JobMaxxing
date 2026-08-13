@@ -8,7 +8,7 @@
 [![JWT](https://img.shields.io/badge/JWT-Tokens-000000?logo=json-web-tokens&logoColor=white)](https://jwt.io/)
 [![BeautifulSoup](https://img.shields.io/badge/BeautifulSoup-4-green)](https://www.crummy.com/software/BeautifulSoup/)
 
-Welcome to the **`jithu`** branch of **JobMaxxing** . This branch upgrades the codebase from a simple scraping tool to a **secure, database-backed enterprise aggregator platform** with user authentication, profile management, and role-based permissions.
+**JobMaxxing** , also referred to as **Velai-Vaaippu**, is a modern full-stack web application designed to simplify the internship search process. It automatically scrapes, aggregates, and presents real-time internship postings from Internshala directly to the user in a clean, unified dashboard.
 
 ---
 
