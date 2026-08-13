@@ -1,134 +1,156 @@
-# 💼 Velai-Vaaippu (JobMaxxing)
+# 💼 Velai-Vaaippu (JobMaxxing) — Advanced Branch
 
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-7.0-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
 [![Flask](https://img.shields.io/badge/Flask-3.0-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
-[![Playwright](https://img.shields.io/badge/Playwright-Python-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev/)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-red?logo=sqlite&logoColor=white)](https://www.sqlalchemy.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![JWT](https://img.shields.io/badge/JWT-Tokens-000000?logo=json-web-tokens&logoColor=white)](https://jwt.io/)
 [![BeautifulSoup](https://img.shields.io/badge/BeautifulSoup-4-green)](https://www.crummy.com/software/BeautifulSoup/)
 
-**Velai-Vaaippu** (translates to *Job Opportunity* in Tamil), also referred to as **JobMaxxing**, is a modern full-stack web application designed to simplify the internship search process. It automatically scrapes, aggregates, and presents real-time internship postings from Internshala directly to the user in a clean, unified dashboard.
+Welcome to the **`jithu`** branch of **JobMaxxing** . This branch upgrades the codebase from a simple scraping tool to a **secure, database-backed enterprise aggregator platform** with user authentication, profile management, and role-based permissions.
 
 ---
 
-## 🏗️ Architecture Flow
+## 🏗️ Architecture & Database Flow
 
-The application leverages a decoupled microservices-like architecture:
-1. **Frontend**: A React application built with Vite that fetches aggregated data.
-2. **Backend**: A Flask web api service serving endpoints.
-3. **Scraper Engine**: A web scraper powered by Playwright and BeautifulSoup4 that dynamically navigates, waits for client-side JavaScript rendering, and extracts details.
+The platform utilizes a structured relational database model to organize companies, scrape sources, and job cards. 
 
 ```mermaid
 graph TD
-    A[React Client :5173] -->|HTTP GET /jobs| B[Flask API :5000]
-    B -->|Initiate Scrape| C[Playwright Engine]
-    C -->|Navigate & Load JS| D[Internshala Internships Website]
-    D -->|HTML Content| C
-    C -->|Parse HTML| E[BeautifulSoup4 Parser]
-    E -->|Structured JSON Data| B
-    B -->|CORS Response| A
-    A -->|Render Cards| F[User UI Dashboard]
+    A[React Client] -->|Axios REST Calls| B[Flask API Gateway]
+    B -->|PyJWT / Flask JWT Extended| C{Auth & Role Gate}
+    
+    %% Routes
+    C -->|Student Routes| D[Jobs, Profile, Companies]
+    C -->|Admin Routes| E[Scrape Engine, Job/Company CRUD]
+    
+    %% Models
+    D & E -->|SQLAlchemy ORM| F[(MySQL Database: vv_db)]
+    
+    %% Scraper
+    E -->|Scrape Request| G[BeautifulSoup4 Scraper]
+    G -->|Parse HTML| H[Internshala Listings]
+    H -->|Upsert Logic| F
 ```
 
----
+### 🗄️ Database Schema
+The database (managed via `Flask-Migrate` / `Alembic`) contains four key models defined in [api/models.py](file:///d:/Projects/jithu/JobMaxxing/api/models.py):
 
-## ✨ Features
-
-- **Dynamic Headless Scraping**: Launches a headless Chromium browser using Playwright to bypass initial static load limitations and execute client-side scripts.
-- **Rich Data Extraction**: Extracts comprehensive listings, including:
-  - **Job Title & Company Name**
-  - **Location** (On-site / Work from Home)
-  - **Stipend Details** and **Duration**
-  - **Required Skills** (rendered as clean tag components)
-  - **Application Status & Deadlines**
-  - **Pre-Placement Offer (PPO)** opportunities
-- **Decoupled API Routing**: Utilizes Flask Blueprints for routing and clean codebase division.
-- **Modern Component-driven UI**: Features a card-based React UI layout designed for quick scanning and ease of reading.
+*   **`User`**: Manages credentials, hashed passwords (using Werkzeug security), roles (`student` vs. `admin`), and student resume URLs.
+*   **`Company`**: Standardized company catalog.
+*   **`JobSource`**: Maps the platform source type (e.g. `internshala`) and url metadata.
+*   **`Job`**: Details including title, location, salary/stipend, duration, apply link, deadline, active status, and timestamps.
 
 ---
 
-## 🛠️ Tech Stack
+## ✨ Features Added in this Branch
 
-### Frontend
-- **Framework**: React 19
-- **Bundler / Build Tool**: Vite 7
-- **Routing**: React Router DOM 7
-- **Styling**: Component-level Tailwind CSS classes
-
-### Backend
-- **Core Framework**: Python 3 & Flask
-- **Middleware**: Flask-CORS (Cross-Origin Resource Sharing enablement)
-- **Scraping**: Playwright Python (`sync_api`)
-- **Parsing**: BeautifulSoup4 (`bs4`)
+1.  **User Authentication & Security**:
+    *   Secure signup (`POST /users`) and login (`POST /login`) with Werkzeug password hashing.
+    *   **JWT Token Verification** (with 2-hour expiration) guarding routes and sessions.
+2.  **Role-Based Access Control**:
+    *   **Students**: View job listings, inspect job details, manage accounts, and upload resume links.
+    *   **Admins**: Trigger automated scrapers (`/admin/scraping`) and run full CRUD operations (Edit/Delete) on jobs and companies.
+3.  **Relational Database Persistence**:
+    *   Replaced inline list-dumps with **MySQL database storage**.
+    *   Smart upsert routines mapping scraped listings to existing Companies and JobSources without duplicates.
+4.  **Polish Custom CSS Design System**:
+    *   A centralized stylesheet design system in [client/src/styles/](file:///d:/Projects/jithu/JobMaxxing/client/src/styles/) containing styling for login forms, profile views, header layouts, message boxes, and dashboard cards.
 
 ---
 
-## 🚀 Getting Started
+## 🛠️ API Reference
 
-Follow these instructions to set up the project locally on your machine.
+### Auth Endpoints
+*   `POST /users` — Sign up a new user (default role: `student`).
+*   `POST /login` — Authenticate and receive a JWT Bearer token.
+*   `GET /user/role` — Verify JWT validity and fetch user authorization level.
+
+### Job Endpoints
+*   `GET /jobs` — Retrieve active jobs from the database.
+*   `GET /jobs/<job_id>` — Fetch detailed view for a single job description.
+*   `PUT /jobs/<job_id>` — *(Admin only)* Edit job details.
+*   `DELETE /jobs/<job_id>` — *(Admin only)* Delete job listing.
+
+### Company Endpoints
+*   `GET /companies` — List all registered companies.
+*   `POST /companies` — *(Admin only)* Add a new company name.
+*   `PUT /companies/<company_id>` — *(Admin only)* Edit company details.
+*   `DELETE /companies/<company_id>` — *(Admin only)* Delete company.
+
+### Scrape Endpoints
+*   `GET/POST /scrape/python` — *(Admin only)* Scrape 5 pages of Python jobs.
+*   `GET/POST /scrape/webdev` — *(Admin only)* Scrape 5 pages of Web Development jobs.
+*   `GET/POST /scrape/internships` — *(Admin only)* Scrape general internships.
+
+---
+
+## 🚀 Setting Up the Branch
 
 ### Prerequisites
-- Python 3.9+
-- Node.js 18+
-- npm (Node Package Manager)
+*   **MySQL Server** running locally or remotely.
+*   **Python 3.9+** and **Node.js 18+**.
 
----
+### 1. Database Configuration
+1. Log into your MySQL CLI or manager and create a database:
+   ```sql
+   CREATE DATABASE vv_db;
+   ```
+2. Create a `.env` file in the [api/](file:///d:/Projects/jithu/JobMaxxing/api/) directory (or configure the connection directly in [api/api.py](file:///d:/Projects/jithu/JobMaxxing/api/api.py)):
+   ```env
+   DATABASE_URL=mysql+mysqlconnector://<db_user>:<db_password>@localhost/vv_db
+   ```
+3. Initialize the database and run migrations:
+   ```bash
+   cd api
+   flask db init
+   flask db migrate -m "Initial migration"
+   flask db upgrade
+   ```
 
-### 1. Backend Setup (Flask)
-
-Navigate to the `api` directory and configure the environment:
-
+### 2. Backend Server Setup
+In the [api/](file:///d:/Projects/jithu/JobMaxxing/api/) folder, run:
 ```bash
-# Navigate to api folder
-cd api
-
-# Create a virtual environment
+# Set up environment and dependencies
 python -m venv venv
-
-# Activate the virtual environment
-# On Windows (PowerShell):
-.\venv\Scripts\Activate.ps1
-# On Windows (CMD):
-.\venv\Scripts\activate.bat
-# On macOS/Linux:
+# On Windows (PowerShell/CMD):
+.\venv\Scripts\activate
+# On Linux/macOS:
 source venv/bin/activate
 
-# Install the required Python packages
 pip install -r requirements.txt
-
-# Install Playwright browsers (Required for headful/headless automation)
-playwright install chromium
-```
-
-To run the Flask server:
-```bash
 python api.py
 ```
-The API server will launch at `http://127.0.0.1:5000`.
+*API server spins up at `http://localhost:5000`.*
 
----
-
-### 2. Frontend Setup (React + Vite)
-
-In a new terminal, navigate to the `client` directory and install dependencies:
-
+### 3. Frontend Client Setup
+In the [client/](file:///d:/Projects/jithu/JobMaxxing/client/) folder, run:
 ```bash
-# Navigate to client folder
-cd client
-
-# Install packages
 npm install
-```
-
-To launch the frontend development server:
-```bash
 npm run dev
 ```
-The client application will run at `http://localhost:5173`. Open this URL in your web browser.
+*React client launches at `http://localhost:5173`.*
 
 ---
 
-## 📈 Future Enhancements
-- **Caching & Database Storage**: Implement a MongoDB or PostgreSQL database to cache job postings, avoiding high scraping latency on every page refresh.
-- **Search & Advanced Filtering**: Add filter controls for stipend amount, duration, remote/on-site status, and required skills.
-- **Scheduled Cron Jobs**: Configure celery/cron tasks to scrape listings periodically in the background rather than on-demand.
-- **Job Tracker & Application History**: Let users save jobs, write notes, and track their application progress.
+## 📂 Key File Directories
+
+```
+JobMaxxing/
+│
+├── api/                             # Python Flask Backend
+│   ├── routes/                      # Route Blueprints (auth, jobs, scrape, profile, companies)
+│   ├── scraping/                    # Scraping module (BeautifulSoup parser)
+│   ├── models.py                    # SQLAlchemy Models
+│   ├── api.py                       # App Entry Point & Database Configs
+│   └── requirements.txt             # Backend Dependencies
+│
+└── client/                          # React Frontend
+    ├── src/
+    │   ├── api/                     # Axios API endpoints
+    │   ├── components/              # Shared Elements (Header, JobCard, MessageBox, AdminRoute)
+    │   ├── pages/                   # Views (Home, Jobs, JobPage, Profile, LoginPage, SignUpPage, ScrapePage)
+    │   └── styles/                  # Clean CSS Design System
+    └── package.json
+```
