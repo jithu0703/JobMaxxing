@@ -1,0 +1,232 @@
+/* colors.css - Velai Vaaippu Color Scheme */
+
+:root {
+  /* Primary Brand Colors - Professional Blue/Teal */
+  --color-primary-50: #e0f2f7;
+  --color-primary-100: #b3dfe8;
+  --color-primary-200: #80cbd8;
+  --color-primary-300: #4db6c8;
+  --color-primary-400: #26a6bc;
+  --color-primary-500: #0097b0;
+  --color-primary-600: #008fa9;
+  --color-primary-700: #0084a0;
+  --color-primary-800: #007a97;
+  --color-primary-900: #006787;
+
+  /* Secondary Colors - Warm Orange/Amber (for CTAs) */
+  --color-secondary-50: #fff8e1;
+  --color-secondary-100: #ffecb3;
+  --color-secondary-200: #ffe082;
+  --color-secondary-300: #ffd54f;
+  --color-secondary-400: #ffca28;
+  --color-secondary-500: #ffc107;
+  --color-secondary-600: #ffb300;
+  --color-secondary-700: #ffa000;
+  --color-secondary-800: #ff8f00;
+  --color-secondary-900: #ff6f00;
+
+  /* Accent Color - Success Green */
+  --color-accent-50: #e8f5e9;
+  --color-accent-100: #c8e6c9;
+  --color-accent-200: #a5d6a7;
+  --color-accent-300: #81c784;
+  --color-accent-400: #66bb6a;
+  --color-accent-500: #4caf50;
+  --color-accent-600: #43a047;
+  --color-accent-700: #388e3c;
+  --color-accent-800: #2e7d32;
+  --color-accent-900: #1b5e20;
+
+  /* Neutral Colors - Light Mode */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #eeeeee;
+  --color-neutral-300: #e0e0e0;
+  --color-neutral-400: #bdbdbd;
+  --color-neutral-500: #9e9e9e;
+  --color-neutral-600: #757575;
+  --color-neutral-700: #616161;
+  --color-neutral-800: #424242;
+  --color-neutral-900: #212121;
+
+  /* Semantic Colors */
+  --color-error-light: #ffebee;
+  --color-error: #f44336;
+  --color-error-dark: #c62828;
+
+  --color-warning-light: #fff3e0;
+  --color-warning: #ff9800;
+  --color-warning-dark: #e65100;
+
+  --color-success-light: #e8f5e9;
+  --color-success: #4caf50;
+  --color-success-dark: #2e7d32;
+
+  --color-info-light: #e3f2fd;
+  --color-info: #2196f3;
+  --color-info-dark: #1565c0;
+
+  /* Light Theme Variables */
+  --color-background: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #ffffff;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #999999;
+  --color-border: #e0e0e0;
+  --color-border-light: #f0f0f0;
+  --color-divider: #eeeeee;
+
+  /* Button Colors */
+  --color-btn-primary-bg: var(--color-primary-500);
+  --color-btn-primary-hover: var(--color-primary-600);
+  --color-btn-primary-active: var(--color-primary-700);
+  --color-btn-primary-text: #ffffff;
+
+  --color-btn-secondary-bg: var(--color-secondary-500);
+  --color-btn-secondary-hover: var(--color-secondary-600);
+  --color-btn-secondary-active: var(--color-secondary-700);
+  --color-btn-secondary-text: #1a1a1a;
+
+  --color-btn-outline-border: var(--color-primary-500);
+  --color-btn-outline-text: var(--color-primary-500);
+  --color-btn-outline-hover-bg: var(--color-primary-50);
+
+  /* Input Colors */
+  --color-input-bg: #ffffff;
+  --color-input-border: #d0d0d0;
+  --color-input-border-focus: var(--color-primary-500);
+  --color-input-text: #1a1a1a;
+  --color-input-placeholder: #999999;
+
+  /* Shadow & Effects */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.15);
+
+  --focus-ring: 0 0 0 3px rgba(0, 151, 176, 0.2);
+
+  /* Border Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Typography */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+  --font-family-mono: "Fira Code", "Courier New", monospace;
+
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
+  --font-size-4xl: 36px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #0f1419;
+    --color-surface: #1a1f2e;
+    --color-surface-elevated: #232936;
+    --color-text-primary: #e8eaed;
+    --color-text-secondary: #b8bcc4;
+    --color-text-tertiary: #868b94;
+    --color-border: #3a3f4d;
+    --color-border-light: #2e333e;
+    --color-divider: #2a2f3a;
+
+    --color-input-bg: #1a1f2e;
+    --color-input-border: #3a3f4d;
+    --color-input-border-focus: var(--color-primary-400);
+    --color-input-text: #e8eaed;
+    --color-input-placeholder: #868b94;
+
+    --color-btn-outline-hover-bg: rgba(0, 151, 176, 0.1);
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.45);
+    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Manual dark mode toggle */
+[data-theme="dark"] {
+  --color-background: #0f1419;
+  --color-surface: #1a1f2e;
+  --color-surface-elevated: #232936;
+  --color-text-primary: #e8eaed;
+  --color-text-secondary: #b8bcc4;
+  --color-text-tertiary: #868b94;
+  --color-border: #3a3f4d;
+  --color-border-light: #2e333e;
+  --color-divider: #2a2f3a;
+
+  --color-input-bg: #1a1f2e;
+  --color-input-border: #3a3f4d;
+  --color-input-border-focus: var(--color-primary-400);
+  --color-input-text: #e8eaed;
+  --color-input-placeholder: #868b94;
+
+  --color-btn-outline-hover-bg: rgba(0, 151, 176, 0.1);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.45);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] {
+  --color-background: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #ffffff;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #999999;
+  --color-border: #e0e0e0;
+  --color-border-light: #f0f0f0;
+  --color-divider: #eeeeee;
+
+  --color-input-bg: #ffffff;
+  --color-input-border: #d0d0d0;
+  --color-input-text: #1a1a1a;
+  --color-input-placeholder: #999999;
+}

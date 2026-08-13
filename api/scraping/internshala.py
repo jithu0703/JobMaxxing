@@ -1,44 +1,114 @@
-from playwright.sync_api import sync_playwright
+from models import db, Company, Job, JobSource
+import requests
 from bs4 import BeautifulSoup
 
-def scrape_internshala():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.goto("https://internshala.com/internships", timeout=60000, wait_until="domcontentloaded")
-        page.wait_for_timeout(5000)  # wait for JS to render
 
-        html = page.content()
-        browser.close()
+def scrape_internshala(keyword="internships", max_pages=1):
+    base_url = f"https://internshala.com/{keyword}"
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/120.0.0.0 Safari/537.36"
+        )
+    }
 
-    soup = BeautifulSoup(html, "html.parser")
-    internships = soup.find_all("div", class_="individual_internship")
-    results = []
+    all_jobs = []
 
-    for card in internships:
-            title = card.find("a", class_="job-title-href")
-            company = card.find("p", class_="company-name")
-            location = card.find("div", class_="locations")
-            stipend = card.find("span", class_="stipend")
-            duration_divs = card.find_all("div", class_="row-1-item")
-            
-            description_div = card.find("div", class_="about_job")
-            skills_divs = card.find_all("div", class_="job_skill")
-            posted_div = card.find("div", class_="status-success")
-            ppo_div = card.find("div", class_="ppo_status")
+    for page in range(1, max_pages + 1):
+        url = f"{base_url}/page-{page}/"
+        params = {"q": keyword}
+        resp = requests.get(url, headers=headers, params=params)
+        if resp.status_code != 200:
+            continue
+        soup = BeautifulSoup(resp.text, "html.parser")
+        cards = soup.find_all("div", class_="individual_internship")
 
-            results.append({
-                "title": title.text.strip() if title else None,
-                "company": company.text.strip() if company else None,
-                "location": location.text.strip() if location else None,
-                "stipend": stipend.text.strip() if stipend else None,
-                "duration": duration_divs[-1].span.text.strip() if duration_divs else None,
-                "description": description_div.text.strip() if description_div else None,
-                "skills": [s.text.strip() for s in skills_divs],
-                "posted": posted_div.text.strip() if posted_div else None,
-                "ppo": ppo_div.text.strip() if ppo_div else None
+        for card in cards:
+            data_href = card.get("data-href", "")
+            link = f"https://internshala.com{data_href}" if data_href else None
+            title_tag = card.find("a", class_="job-title-href")
+            title = title_tag.text.strip() if title_tag else None
+            company_tag = card.find("p", class_="company-name")
+            company_name = company_tag.text.strip() if company_tag else None
+            location_tag = card.find("div", class_="row-1-item locations")
+            location = location_tag.get_text(strip=True).split("(")[0] if location_tag else None
+            stipend_tag = card.find("span", class_="stipend")
+            stipend = stipend_tag.text.strip() if stipend_tag else None
+            duration_tag = card.find("div", class_="row-1-item")
+            duration = duration_tag.text.strip() if duration_tag else None
+
+            if not title or not company_name:
+                # Skip incomplete entries
+                continue
+
+            # Handle Company
+            company = Company.query.filter_by(company_name=company_name).first()
+            if not company:
+                company = Company(company_name=company_name)
+                db.session.add(company)
+                db.session.flush()  # Ensures company_id is generated
+
+            # Handle JobSource (unique per company and source url for Internshala)
+            job_source = JobSource.query.filter_by(
+                company_id=company.company_id,
+                source_type="internshala",
+                source_url=url
+            ).first()
+
+            if not job_source:
+                job_source = JobSource(
+                    company_id=company.company_id,
+                    source_type="internshala",
+                    source_url=url
+                )
+                db.session.add(job_source)
+                db.session.flush()  # Ensures source_id is generated
+
+            # Handle Job (unique by title, company, and link)
+            job = Job.query.filter_by(
+                title=title,
+                company_id=company.company_id
+            ).first()
+
+            if job:
+                # Update job details if exists
+                job.location = location
+                job.salary = stipend
+                job.description = duration
+                job.source_id = job_source.source_id
+                job.is_active = True
+            else:
+                job = Job(
+                    title=title,
+                    company_id=company.company_id,
+                    source_id=job_source.source_id,
+                    location=location,
+                    salary=stipend,
+                    description=duration,
+                    apply_url=link,
+                    is_active=True
+                )
+                db.session.add(job)
+
+            all_jobs.append({
+                "Title": title,
+                "Company": company_name,
+                "Location": location,
+                "Stipend": stipend,
+                "Duration": duration,
+                "Link": link
             })
 
-    return results
+    db.session.commit()
 
-#print(scrape_internshala())
+    return {"scraped_count": len(all_jobs), "jobs": all_jobs}
+
+
+# Example CLI usage
+if __name__ == "__main__":
+    from flask import Flask
+    app = Flask(__name__)
+    with app.app_context():
+        jobs = scrape_internshala("python", 1)
+        print(f"Scraped {jobs['scraped_count']} jobs.")
