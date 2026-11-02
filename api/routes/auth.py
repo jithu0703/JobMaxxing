@@ -82,3 +82,5 @@ def get_user_role():
         return jsonify({"message": "Token expired"}), 401
     except jwt.InvalidTokenError:
         return jsonify({"message": "Invalid token"}), 401
+    
+

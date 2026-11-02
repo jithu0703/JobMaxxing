@@ -1,8 +1,17 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Table
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
+
+user_likes_job = Table(
+    'user_likes_job',
+    db.Model.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('users.user_id'), primary_key=True),
+    db.Column('job_id', db.Integer, db.ForeignKey('jobs.job_id'), primary_key=True),
+    db.Column('liked_at', db.DateTime, default=datetime.utcnow)
+)
 
 class User(db.Model):
     __tablename__ = "users"
@@ -15,6 +24,12 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+
+    liked_jobs = db.relationship(
+        'Job',
+        secondary=user_likes_job,
+        back_populates='liked_by_users'
+    )
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
@@ -74,3 +89,8 @@ class Job(db.Model):
 
     company = db.relationship("Company", back_populates="jobs")
     source = db.relationship("JobSource", back_populates="jobs")
+    liked_by_users = db.relationship(
+        'User',
+        secondary=user_likes_job,
+        back_populates='liked_jobs'
+    )
