@@ -11,7 +11,8 @@ function JobPage() {
   const [error, setError] = useState(null);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({});
-  const [isAdmin, setIsAdmin] = useState(false); // Replace with real admin check
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [liked, setLiked] = useState(false);
 
   useEffect(() => {
     async function fetchJob() {
@@ -19,21 +20,23 @@ function JobPage() {
       setError(null);
       try {
         const token = localStorage.getItem("authToken");
-        const res = await axios.get(`http://localhost:5000/jobs/${jobId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setJob(res.data.job);
-        setFormData(res.data.job);
-
-        // Simple admin check example - adjust as per your auth logic
+        const headers = { Authorization: `Bearer ${token}` };
+        const res = await axios.get(`http://localhost:5000/jobs/${jobId}`, { headers });
+        const jobData = res.data.job;
+        setJob(jobData);
+        setFormData({ ...jobData });
+        // Check admin role
         const userRole = parseJwt(token)?.role;
         setIsAdmin(userRole === "admin");
+        // Set liked state
+        setLiked(jobData.isLikedByUser || false);
       } catch {
         setError("Failed to load job details.");
       } finally {
         setLoading(false);
       }
     }
+
     fetchJob();
   }, [jobId]);
 
@@ -47,25 +50,21 @@ function JobPage() {
   }
 
   const handleApplyClick = () => {
-    if (job.applyUrl) {
+    if (job?.applyUrl) {
       window.open(job.applyUrl, "_blank", "noopener noreferrer");
     }
   };
 
-  function handleChange(e) {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  }
+  };
 
-  async function handleSave() {
+  const handleSave = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("authToken");
-      await axios.put(
-        `http://localhost:5000/jobs/${jobId}`,
-        formData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.put(`http://localhost:5000/jobs/${jobId}`, formData, { headers: { Authorization: `Bearer ${token}` } });
       setJob(formData);
       setEditing(false);
     } catch {
@@ -73,23 +72,40 @@ function JobPage() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  async function handleDelete() {
+  const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this job?")) return;
     setLoading(true);
     try {
       const token = localStorage.getItem("authToken");
-      await axios.delete(`http://localhost:5000/jobs/${jobId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      navigate(-1); // Go back after deletion
+      await axios.delete(`http://localhost:5000/jobs/${jobId}`, { headers: { Authorization: `Bearer ${token}` } });
+      navigate(-1);
     } catch {
       alert("Failed to delete job");
     } finally {
       setLoading(false);
     }
-  }
+  };
+
+  const handleLikeToggle = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      alert("Please log in to like jobs.");
+      return;
+    }
+    try {
+      if (!liked) {
+        await axios.post(`http://localhost:5000/jobs/${jobId}/like`, {}, { headers: { Authorization: `Bearer ${token}` } });
+        setLiked(true);
+      } else {
+        await axios.delete(`http://localhost:5000/jobs/${jobId}/like`, { headers: { Authorization: `Bearer ${token}` } });
+        setLiked(false);
+      }
+    } catch {
+      alert("Failed to update like status.");
+    }
+  };
 
   if (loading) return <div>Loading job details...</div>;
   if (error) return <div style={{ color: "red" }}>{error}</div>;
@@ -97,93 +113,57 @@ function JobPage() {
 
   return (
     <div className="job-page-container">
+      {/* Like Button */}
+      <button
+        className={`like-button ${liked ? "liked" : ""}`}
+        onClick={handleLikeToggle}
+        aria-label={liked ? "Unlike job" : "Like job"}
+      >
+        {liked ? "♥ Liked" : "♡ Like"}
+      </button>
+
       {editing ? (
         <div className="job-edit-form">
-      <label>
-      Title
-      <input
-        type="text"
-        name="title"
-        value={formData.title}
-        onChange={handleChange}
-        className="input-field"
-      />
-      </label>
-
-      <label>
-      Location
-      <input
-        type="text"
-        name="location"
-        value={formData.location}
-        onChange={handleChange}
-        className="input-field"
-      />
-      </label>
-
-      <label>
-      Salary
-      <input
-        type="text"
-        name="salary"
-        value={formData.salary}
-        onChange={handleChange}
-        className="input-field"
-      />
-      </label>
-
-      <label>
-      Type
-      <input
-        type="text"
-        name="type"
-        value={formData.type}
-        onChange={handleChange}
-        className="input-field"
-      />
-      </label>
-
-      <label>
-      Description
-      <textarea
-        name="description"
-        value={formData.description}
-        onChange={handleChange}
-        className="textarea-field"
-        rows={6}
-      />
-      </label>
-
-      <label>
-      Apply URL
-      <input
-        type="text"
-        name="applyUrl"
-        value={formData.applyUrl || ""}
-        onChange={handleChange}
-        className="input-field"
-      />
-      </label>
-
-      <div className="edit-form-buttons">
-        <button
-        onClick={handleSave}
-        disabled={loading}
-        className="btn btn-primary"
-        >
-        Save
-        </button>
-        <button
-          onClick={() => setEditing(false)}
-          disabled={loading}
-          className="btn btn-secondary"
-        >
-        Cancel
-        </button>
-      </div>
-  </div>
+          {/* Editable form fields */}
+          {/* Title */}
+          <label>
+            Title
+            <input type="text" name="title" value={formData.title} onChange={handleChange} className="input-field" />
+          </label>
+          {/* Location */}
+          <label>
+            Location
+            <input type="text" name="location" value={formData.location} onChange={handleChange} className="input-field" />
+          </label>
+          {/* Salary */}
+          <label>
+            Salary
+            <input type="text" name="salary" value={formData.salary} onChange={handleChange} className="input-field" />
+          </label>
+          {/* Type */}
+          <label>
+            Type
+            <input type="text" name="type" value={formData.type} onChange={handleChange} className="input-field" />
+          </label>
+          {/* Description */}
+          <label>
+            Description
+            <textarea name="description" value={formData.description} onChange={handleChange} className="textarea-field" rows={6} />
+          </label>
+          {/* Apply URL */}
+          <label>
+            Apply URL
+            <input type="text" name="applyUrl" value={formData.applyUrl || ""} onChange={handleChange} className="input-field" />
+          </label>
+          {/* Save/Cancel Buttons */}
+          <div className="edit-form-buttons">
+            <button onClick={handleSave} disabled={loading} className="btn btn-primary">Save</button>
+            <button onClick={() => setEditing(false)} disabled={loading} className="btn btn-secondary">Cancel</button>
+          </div>
+        </div>
       ) : (
         <>
+          {/* Job Display */}
           <h1 className="job-title">{job.title}</h1>
           <h3 className="company-name">{job.companyName}</h3>
           <div className="job-meta">
@@ -192,17 +172,17 @@ function JobPage() {
             <span>Salary: {job.salary || "N/A"}</span>
           </div>
           <div className="job-dates">
-            <span>Posted: {job.postedDate}</span><br/>
+            <span>Posted: {job.postedDate}</span>
+            <br />
             <span>Deadline: {job.deadline || "Open"}</span>
           </div>
           <div className="job-description">
             <h4>Job Description</h4>
             <p>{job.description}</p>
           </div>
-          <button className="apply-button" onClick={handleApplyClick}>
-            Apply Now
-          </button>
+          <button className="apply-button" onClick={handleApplyClick}>Apply Now</button>
 
+          {/* Admin Actions */}
           {isAdmin && (
             <div className="job-admin-actions">
               <button onClick={() => setEditing(true)}>Edit</button>

@@ -58,6 +58,14 @@ function Header() {
                 Companies
               </Link>
             )}
+            {isAdmin && (
+              <Link to="/admin/scraping" className="nav-link">
+                Scrape
+              </Link>
+            )}
+            <Link to="/favourites" className="nav-link">
+                Favourites
+            </Link>
             <button className="nav-link logout-btn" onClick={handleLogout}>
               Logout
             </button>

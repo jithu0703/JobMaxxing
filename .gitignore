@@ -31,3 +31,6 @@ migrations/
 *.njsproj
 *.sln
 *.sw?
+
+# Interview prep & personal notes
+docs/interview_prep.md
